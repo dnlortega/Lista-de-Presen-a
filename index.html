@@ -16,6 +16,9 @@
     <button id="history-toggle" class="theme-toggle history-btn" onclick="loadHistory()" aria-label="Histórico">
         🕒
     </button>
+    <button id="admin-toggle" class="theme-toggle admin-btn" onclick="showAdminScreen()" aria-label="Gerenciar Dados">
+        ⚙️
+    </button>
 
     <div class="container">
 
@@ -65,6 +68,48 @@
             </p>
             <div id="list-history">
                 <!-- Itens do histórico -->
+            </div>
+        </div>
+
+        <div id="screen-admin" class="screen">
+            <div class="header">
+                <button class="back-button" onclick="showScreen('screen-empresa')">← INÍCIO</button>
+                <h2>GERENCIAR DADOS</h2>
+            </div>
+
+            <div class="admin-controls">
+                <button class="action-btn primary" onclick="openEditModal()">+ Novo Funcionário</button>
+                <button class="action-btn secondary" onclick="downloadDataJs()">⬇ Baixar data.js</button>
+                <button class="action-btn danger" onclick="resetData()">⚠ Resetar</button>
+            </div>
+
+            <input type="text" id="admin-search" placeholder="Buscar funcionário..." onkeyup="filterAdminList()"
+                class="search-input">
+
+            <div id="list-admin" class="admin-list">
+                <!-- Lista de funcionários para edição -->
+            </div>
+        </div>
+
+        <!-- Modal de Edição -->
+        <div id="edit-modal" class="modal">
+            <div class="modal-content">
+                <h3>Editar Funcionário</h3>
+                <input type="hidden" id="edit-index">
+
+                <label>Nome</label>
+                <input type="text" id="edit-nome" placeholder="Nome Completo">
+
+                <label>Empresa</label>
+                <input type="text" id="edit-empresa" placeholder="Ex: HUB">
+
+                <label>Setor</label>
+                <input type="text" id="edit-setor" placeholder="Ex: TI">
+
+                <div class="modal-actions">
+                    <button class="action-btn secondary" onclick="closeEditModal()">Cancelar</button>
+                    <button class="action-btn primary" onclick="saveFuncionario()">Salvar</button>
+                </div>
             </div>
         </div>
 

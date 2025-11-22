@@ -4,6 +4,15 @@
 const URL_SCRIPT_API = 'https://script.google.com/macros/s/AKfycbx2eMgGrnPB7yMX1SAnF8cwa0NNj9-uPyuIsdS5mz5zCNSjbwr68t8g7Posw56ne9CYkg/exec';
 
 // A variável DADOS_FUNCIONARIOS é carregada do arquivo data.js
+// Mas vamos verificar se existe uma versão local editada
+let localData = localStorage.getItem('custom_data');
+let DADOS_ATUAIS = localData ? JSON.parse(localData) : DADOS_FUNCIONARIOS;
+
+// Se não houver dados locais, inicializa com o padrão para edição futura
+if (!localData) {
+    // Opcional: salvar logo de cara ou esperar a primeira edição?
+    // Vamos esperar a primeira edição para não duplicar dados desnecessariamente no storage
+}
 
 let selectedEmpresa = '';
 let selectedSetor = '';
@@ -77,7 +86,8 @@ function getUniqueValues(data, key) {
 
 // 1ª Tela: Carregar Empresas
 function loadEmpresas() {
-    const empresas = getUniqueValues(DADOS_FUNCIONARIOS, 'Empresa');
+    // Usar DADOS_ATUAIS em vez de DADOS_FUNCIONARIOS
+    const empresas = getUniqueValues(DADOS_ATUAIS, 'Empresa');
     const list = document.getElementById('list-empresas');
     list.innerHTML = '';
 
@@ -109,7 +119,7 @@ function selectEmpresa(empresa) {
 
 // 2ª Tela: Carregar Setores
 function loadSetores(empresa) {
-    const setoresFiltrados = DADOS_FUNCIONARIOS.filter(item => toUpper(item.Empresa) === toUpper(empresa));
+    const setoresFiltrados = DADOS_ATUAIS.filter(item => toUpper(item.Empresa) === toUpper(empresa));
     const setores = getUniqueValues(setoresFiltrados, 'Setor');
     const list = document.getElementById('list-setores');
     list.innerHTML = '';
@@ -142,7 +152,7 @@ function selectSetor(setor) {
 
 // 3ª Tela: Carregar Funcionários
 function loadFuncionarios(empresa, setor) {
-    const funcionarios = DADOS_FUNCIONARIOS.filter(
+    const funcionarios = DADOS_ATUAIS.filter(
         item => toUpper(item.Empresa) === toUpper(empresa) && toUpper(item.Setor) === toUpper(setor)
     );
     const list = document.getElementById('list-funcionarios');
@@ -416,4 +426,133 @@ function removeFromHistory(key) {
 
     // Feedback
     // showMessage('Registro removido do local.', 'success'); // showMessage está em outra tela, melhor usar alert ou nada
+}
+
+// --- PAINEL ADMIN ---
+
+function showAdminScreen() {
+    renderAdminList();
+    showScreen('screen-admin');
+}
+
+function renderAdminList(filter = '') {
+    const list = document.getElementById('list-admin');
+    list.innerHTML = '';
+
+    const term = filter.toUpperCase();
+
+    // Ordenar por Nome
+    const sorted = [...DADOS_ATUAIS].sort((a, b) => a.Nome.localeCompare(b.Nome));
+
+    sorted.forEach((item, index) => {
+        // O índice original no array principal é importante para edição
+        const originalIndex = DADOS_ATUAIS.indexOf(item);
+
+        if (term && !item.Nome.toUpperCase().includes(term) && !item.Empresa.toUpperCase().includes(term)) {
+            return;
+        }
+
+        const div = document.createElement('div');
+        div.className = 'admin-item';
+        div.innerHTML = `
+            <div class="admin-item-info">
+                <span class="admin-item-name">${item.Nome}</span>
+                <span class="admin-item-meta">${item.Empresa} | ${item.Setor}</span>
+            </div>
+            <div class="admin-item-actions">
+                <button class="action-btn secondary" onclick="openEditModal(${originalIndex})">✏</button>
+                <button class="action-btn danger" onclick="deleteFuncionario(${originalIndex})">🗑</button>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function filterAdminList() {
+    const term = document.getElementById('admin-search').value;
+    renderAdminList(term);
+}
+
+// --- CRUD ---
+
+function openEditModal(index = -1) {
+    document.getElementById('edit-modal').classList.add('active');
+    document.getElementById('edit-index').value = index;
+
+    if (index >= 0) {
+        const item = DADOS_ATUAIS[index];
+        document.getElementById('edit-nome').value = item.Nome;
+        document.getElementById('edit-empresa').value = item.Empresa;
+        document.getElementById('edit-setor').value = item.Setor;
+    } else {
+        // Novo
+        document.getElementById('edit-nome').value = '';
+        document.getElementById('edit-empresa').value = '';
+        document.getElementById('edit-setor').value = '';
+    }
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.remove('active');
+}
+
+function saveFuncionario() {
+    const index = parseInt(document.getElementById('edit-index').value);
+    const nome = document.getElementById('edit-nome').value.trim();
+    const empresa = document.getElementById('edit-empresa').value.trim();
+    const setor = document.getElementById('edit-setor').value.trim();
+
+    if (!nome || !empresa || !setor) {
+        alert('Preencha todos os campos.');
+        return;
+    }
+
+    const novoItem = { "Empresa": empresa, "Setor": setor, "Nome": nome };
+
+    if (index >= 0) {
+        // Editar
+        DADOS_ATUAIS[index] = novoItem;
+    } else {
+        // Novo
+        DADOS_ATUAIS.push(novoItem);
+    }
+
+    saveDataLocal();
+    closeEditModal();
+    renderAdminList(document.getElementById('admin-search').value);
+    alert('Salvo com sucesso! (Localmente)');
+}
+
+function deleteFuncionario(index) {
+    if (!confirm('Tem certeza que deseja excluir este funcionário?')) return;
+    DADOS_ATUAIS.splice(index, 1);
+    saveDataLocal();
+    renderAdminList(document.getElementById('admin-search').value);
+}
+
+function saveDataLocal() {
+    localStorage.setItem('custom_data', JSON.stringify(DADOS_ATUAIS));
+    // Recarregar listas principais se estiverem visíveis seria ideal, mas o usuário vai navegar de volta
+}
+
+function resetData() {
+    if (!confirm('Isso apagará todas as suas edições locais e restaurará o arquivo original data.js. Continuar?')) return;
+    localStorage.removeItem('custom_data');
+    location.reload();
+}
+
+// --- EXPORTAR ---
+
+function downloadDataJs() {
+    const content = `const DADOS_FUNCIONARIOS = ${JSON.stringify(DADOS_ATUAIS, null, 2)};\n`;
+    const blob = new Blob([content], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.js';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
