@@ -1,12 +1,79 @@
 // Arquivo: script.js
 
 // *** SUA URL DE IMPLANTAÇÃO DO GOOGLE APPS SCRIPT (FIXADA) ***
+// *** SUA URL DE IMPLANTAÇÃO DO GOOGLE APPS SCRIPT (FIXADA) ***
 const URL_SCRIPT_API = 'https://script.google.com/macros/s/AKfycbx2eMgGrnPB7yMX1SAnF8cwa0NNj9-uPyuIsdS5mz5zCNSjbwr68t8g7Posw56ne9CYkg/exec';
 
+// *** NOVA URL PARA A PLANILHA DE FUNCIONÁRIOS (PREENCHA AQUI) ***
+const URL_SCRIPT_FUNCIONARIOS = 'https://script.google.com/macros/s/AKfycbxMM_mnT4uqRaWadmDOj_JAUdQwWUmpeljz54pM4zpvJ00Mo1u4Lytj2mqcGvD9ZhY/exec';
+
 // A variável DADOS_FUNCIONARIOS é carregada do arquivo data.js
-// Mas vamos verificar se existe uma versão local editada
 let localData = localStorage.getItem('custom_data');
 let DADOS_ATUAIS = localData ? JSON.parse(localData) : DADOS_FUNCIONARIOS;
+
+// ... (rest of the file) ...
+
+async function syncFuncionarios(silent = false) {
+    if (!URL_SCRIPT_FUNCIONARIOS) {
+        if (!silent) alert('Você precisa configurar a URL_SCRIPT_FUNCIONARIOS no arquivo script.js primeiro!');
+        return;
+    }
+
+    if (!silent && !confirm('Isso irá SOBRESCREVER a lista na planilha de FUNCIONÁRIOS. Continuar?')) return;
+
+    const button = document.querySelector('button[onclick="syncFuncionarios()"]');
+    let originalText = '';
+    if (button) {
+        originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Enviando...';
+    }
+
+    // Feedback visual não intrusivo para modo silencioso
+    const statusDiv = document.getElementById('status-message');
+    if (silent) {
+        statusDiv.textContent = 'Sincronizando com a nuvem...';
+        statusDiv.className = 'status-message warning';
+        statusDiv.style.display = 'block';
+    }
+
+    try {
+        const dataToSend = {
+            employees: DADOS_ATUAIS
+        };
+
+        await fetch(URL_SCRIPT_FUNCIONARIOS, {
+            method: 'POST',
+            mode: 'no-cors',
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(dataToSend)
+        });
+
+        if (!silent) {
+            alert('Lista de funcionários enviada com sucesso!');
+        } else {
+            statusDiv.textContent = 'Salvo e Sincronizado!';
+            statusDiv.className = 'status-message success';
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 2000);
+        }
+
+    } catch (error) {
+        console.error('Erro ao sincronizar:', error);
+        if (!silent) {
+            alert('Erro ao conectar com a planilha de funcionários.');
+        } else {
+            statusDiv.textContent = 'Salvo localmente (Erro na nuvem)';
+            statusDiv.className = 'status-message error';
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+        }
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+}
 
 // Se não houver dados locais, inicializa com o padrão para edição futura
 if (!localData) {
@@ -238,7 +305,12 @@ function getEducador() {
 function makeRecordKey(reg) {
     // chave composta: empresa|setor|funcionario|educador|YYYY-MM-DD (evita duplicados no mesmo dia por educador)
     const d = new Date();
-    const dateStr = d.toISOString().slice(0, 10);
+    // Fix: Usar data local em vez de UTC (toISOString) para evitar erro de fuso horário à noite
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+
     const educador = (reg.educador || getEducador() || '').toUpperCase();
     return `${reg.empresa}|${reg.setor}|${reg.funcionario}|${educador}|${dateStr}`;
 }
@@ -365,8 +437,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // 3. Carrega o conteúdo principal
-    loadEmpresas();
+    // Tenta carregar da nuvem primeiro
+    loadFuncionariosFromCloud();
 });
+
+async function loadFuncionariosFromCloud() {
+    if (!URL_SCRIPT_FUNCIONARIOS) {
+        loadEmpresas(); // Fallback para local
+        return;
+    }
+
+    // Mostra loading visual (opcional, pode ser um toast)
+    const statusDiv = document.getElementById('status-message');
+    statusDiv.textContent = 'Carregando funcionários da nuvem...';
+    statusDiv.className = 'status-message warning';
+    statusDiv.style.display = 'block';
+
+    try {
+        const response = await fetch(URL_SCRIPT_FUNCIONARIOS);
+        const data = await response.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+            DADOS_ATUAIS = data;
+            // Atualiza cache local para funcionar offline na próxima
+            localStorage.setItem('custom_data', JSON.stringify(DADOS_ATUAIS));
+            console.log('Dados carregados da nuvem:', data.length);
+
+            statusDiv.textContent = 'Dados atualizados!';
+            statusDiv.className = 'status-message success';
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 2000);
+        } else {
+            console.warn('Nenhum dado retornado da nuvem ou formato inválido.');
+        }
+
+    } catch (error) {
+        console.error('Erro ao carregar da nuvem:', error);
+        statusDiv.textContent = 'Usando dados locais (Offline ou Erro)';
+        statusDiv.className = 'status-message error';
+        setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+    } finally {
+        // Sempre carrega a interface, seja com dados novos ou velhos
+        loadEmpresas();
+    }
+}
 
 // --- HISTÓRICO E CORREÇÃO ---
 
@@ -414,18 +527,55 @@ function loadHistory() {
     showScreen('screen-history');
 }
 
-function removeFromHistory(key) {
-    if (!confirm('Deseja remover este registro do aplicativo? Isso permitirá selecionar o funcionário novamente.')) return;
+async function removeFromHistory(key) {
+    if (!confirm('Deseja remover este registro? Ele será apagado da planilha do Google também.')) return;
 
     const sent = loadSentRecords();
-    delete sent[key];
-    saveSentRecords(sent);
+    // key format: empresa|setor|funcionario|educador|YYYY-MM-DD
+    const parts = key.split('|');
+    const registro = {
+        empresa: parts[0],
+        setor: parts[1],
+        funcionario: parts[2],
+        // educador ignorado pois não está mais na planilha
+        date: parts[4]
+    };
 
-    // Recarregar a lista
-    loadHistory();
+    // Feedback visual imediato
+    const btn = document.querySelector(`button[onclick="removeFromHistory('${key}')"]`);
+    if (btn) btn.textContent = 'Apagando...';
 
-    // Feedback
-    // showMessage('Registro removido do local.', 'success'); // showMessage está em outra tela, melhor usar alert ou nada
+    try {
+        const dataToSend = {
+            type: 'delete_attendance',
+            registro: registro
+        };
+
+        const response = await fetch(URL_SCRIPT_API, {
+            method: 'POST',
+            mode: 'no-cors', // ATENÇÃO: Com no-cors, não conseguimos ler o JSON de resposta!
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(dataToSend)
+        });
+
+        // NOTA: Devido ao modo 'no-cors' necessário para Apps Script simples, 
+        // o navegador retorna uma resposta "opaca" e não podemos ler o status ou body.
+        // Assumimos sucesso se não lançar erro de rede.
+        // Se quiser ler a resposta, precisaria configurar o Apps Script para devolver CORS headers corretos,
+        // o que é complexo. Vamos manter assim, mas com o script do lado do Google mais robusto.
+
+        // Remove localmente
+        delete sent[key];
+        saveSentRecords(sent);
+        loadHistory();
+        alert('Comando de exclusão enviado! Verifique a planilha.');
+
+    } catch (error) {
+        console.error('Erro ao deletar:', error);
+        alert('Erro ao conectar com a planilha. Tente novamente.');
+        if (btn) btn.textContent = 'Remover';
+    }
 }
 
 // --- PAINEL ADMIN ---
@@ -520,7 +670,9 @@ function saveFuncionario() {
     saveDataLocal();
     closeEditModal();
     renderAdminList(document.getElementById('admin-search').value);
-    alert('Salvo com sucesso! (Localmente)');
+
+    // Auto-sync
+    syncFuncionarios(true);
 }
 
 function deleteFuncionario(index) {
@@ -528,6 +680,9 @@ function deleteFuncionario(index) {
     DADOS_ATUAIS.splice(index, 1);
     saveDataLocal();
     renderAdminList(document.getElementById('admin-search').value);
+
+    // Auto-sync
+    syncFuncionarios(true);
 }
 
 function saveDataLocal() {
@@ -555,4 +710,64 @@ function downloadDataJs() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+function downloadCSV() {
+    // Cabeçalho do CSV
+    let csvContent = "Nome,Empresa,Setor\n";
+
+    // Adicionar linhas
+    DADOS_ATUAIS.forEach(item => {
+        const nome = item.Nome ? item.Nome.replace(/,/g, "") : "";
+        const empresa = item.Empresa ? item.Empresa.replace(/,/g, "") : "";
+        const setor = item.Setor ? item.Setor.replace(/,/g, "") : "";
+        csvContent += `${nome},${empresa},${setor}\n`;
+    });
+
+    // BOM para UTF-8 (ajuda o Excel a abrir com acentos corretos)
+    const bom = "\uFEFF";
+    const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'funcionarios.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+async function syncFuncionarios() {
+    if (!confirm('Isso irá SOBRESCREVER a lista de funcionários na planilha do Google com a lista atual deste site. Continuar?')) return;
+
+    const button = document.querySelector('button[onclick="syncFuncionarios()"]');
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Enviando...';
+
+    try {
+        const dataToSend = {
+            type: 'update_employees',
+            employees: DADOS_ATUAIS
+        };
+
+        await fetch(URL_SCRIPT_API, {
+            method: 'POST',
+            mode: 'no-cors',
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(dataToSend)
+        });
+
+        // Como é no-cors, não sabemos o resultado real, mas assumimos sucesso se não der erro de rede
+        alert('Comando de sincronização enviado! Verifique a aba "Funcionarios" na sua planilha em instantes.');
+
+    } catch (error) {
+        console.error('Erro ao sincronizar:', error);
+        alert('Erro ao conectar com a planilha.');
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
 }
