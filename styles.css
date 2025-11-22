@@ -1,0 +1,308 @@
+/* ------------------------
+   VARIÁVEIS DE TEMA: MODO CLARO (PADRÃO)
+   ------------------------ */
+:root {
+    --primary-dark: #1f3a60;      /* Azul Marinho Sóbrio - Destaque Principal */
+    --accent-blue: #3498db;       /* Azul para Interação */
+    --background-color: #f9f9f9;  /* Fundo Suave */
+    --card-background: #ffffff;
+    /* ------------------------
+       VARIÁVEIS DE TEMA: MODO CLARO (PADRÃO)
+       ------------------------ */
+    :root {
+        --primary-dark: #1f3a60;      /* Azul Marinho Sóbrio - Destaque Principal */
+        --accent-blue: #3498db;       /* Azul para Interação */
+        --background-color: #f9f9f9;  /* Fundo Suave */
+        --card-background: #ffffff;
+        --text-color: #343a3a;
+        --subtle-text-color: #6c757d;
+        --border-color: #d1d8df;
+        --selection-color: #f0f6fc; 
+        --shadow-color: rgba(0, 0, 0, 0.08);
+
+        /* Status Colors */
+        --success-bg: #e6f9ed; --success-text: #187449; --success-border: #c8e6c9;
+        --error-bg: #fbeaea; --error-text: #b03838; --error-border: #f2c7c7;
+        --warning-bg: #fff8e1; --warning-text: #a07a00; --warning-border: #ffecb3;
+        --toggle-text-color: var(--primary-dark);
+    }
+
+    /* ------------------------
+       VARIÁVEIS DE TEMA: MODO ESCURO
+       ------------------------ */
+    .dark-mode {
+        --primary-dark: #3498db;      /* Azul Claro Sóbrio - Destaque Principal */
+        --accent-blue: #5dade2;
+        --background-color: #1a1a1a;
+        --card-background: #252525;
+        --text-color: #f0f0f0;
+        --subtle-text-color: #aaaaaa;
+        --border-color: #333333;
+        --selection-color: #34495e;
+        --shadow-color: rgba(0, 0, 0, 0.4);
+
+        /* Status Colors */
+        --success-bg: #2b4f3b; --success-text: #d4edda; --success-border: #456d56;
+        --error-bg: #633333; --error-text: #f8d7da; --error-border: #825252;
+        --warning-bg: #6d5b2c; --warning-text: #fff3cd; --warning-border: #8c764a;
+        --toggle-text-color: var(--text-color);
+    }
+
+
+
+    /* ------------------------
+       ESTILOS GERAIS
+       ------------------------ */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        transition: background-color 0.3s;
+    }
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 15px;
+    }
+    .screen {
+        display: none;
+        /* animação de entrada padrão da tela */
+        animation: screenFadeIn 0.35s cubic-bezier(.2,.8,.2,1);
+    }
+    .screen.active {
+        display: block;
+    }
+    @keyframes screenFadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* animação de entrada dos itens da lista (usada com delay inline para stagger) */
+    @keyframes itemPop {
+        0% { opacity: 0; transform: translateY(8px) scale(0.995); }
+        60% { opacity: 1; transform: translateY(-4px) scale(1.02); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ------------------------
+       ESTILO DO BOTÃO DE TEMA
+       ------------------------ */
+    .theme-toggle {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background-color: var(--card-background);
+        color: var(--toggle-text-color);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        box-shadow: 0 2px 5px var(--shadow-color);
+        z-index: 1000;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .history-btn {
+        right: 60px; /* Posiciona ao lado do botão de tema */
+    }
+
+    /* Cabeçalhos */
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 0 0 15px 0;
+        border-bottom: 2px solid var(--border-color);
+        margin-bottom: 20px;
+    }
+    .header h2 {
+        flex-grow: 1;
+        margin: 0;
+        font-size: 1.4rem;
+        color: var(--primary-dark);
+        font-weight: 600;
+    }
+    .back-button {
+        background: none;
+        border: none;
+        color: var(--primary-dark);
+        font-size: 0.9rem;
+        cursor: pointer;
+        padding: 5px 10px;
+        transition: color 0.2s;
+        text-transform: uppercase;
+    }
+    .back-button:hover {
+        color: var(--accent-blue);
+    }
+
+    /* Itens de Lista (Cards) */
+    .list-item {
+        background-color: var(--card-background);
+        border: 1px solid var(--border-color);
+        padding: 18px 15px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        border-radius: 6px;
+        box-shadow: 0 2px 5px var(--shadow-color);
+        transition: all 0.2s;
+        font-size: 1rem;
+        text-transform: uppercase; 
+        will-change: transform, opacity;
+    }
+    .list-item:hover {
+        background-color: var(--selection-color);
+        transform: translateY(-3px);
+    }
+
+    .list-item.animate-item {
+        animation: itemPop 360ms cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    /* Item de Histórico */
+    .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--card-background);
+        border: 1px solid var(--border-color);
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px var(--shadow-color);
+    }
+    .history-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .history-name {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    .history-details {
+        font-size: 0.85em;
+        color: var(--subtle-text-color);
+    }
+    .delete-btn {
+        background: none;
+        border: 1px solid var(--error-border);
+        color: var(--error-text);
+        background-color: var(--error-bg);
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85em;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .delete-btn:hover {
+        background-color: var(--error-text);
+        color: white;
+    }
+
+    /* Estado SELECIONADO (Funcionário) */
+    .list-item.selected {
+        background-color: var(--selection-color); 
+        border-left: 5px solid var(--accent-blue);
+        border-color: var(--accent-blue);
+        color: var(--text-color);
+        font-weight: 700;
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    /* Botão de Envio */
+    .send-button {
+        width: 100%;
+        padding: 15px;
+        background-color: var(--primary-dark);
+        color: var(--background-color);
+        border: none;
+        border-radius: 6px;
+        font-size: 1.1em;
+        cursor: pointer;
+        margin-top: 25px;
+        transition: background-color 0.3s;
+        text-transform: uppercase;
+        box-shadow: 0 4px 6px var(--shadow-color);
+    }
+    .send-button:disabled {
+        background-color: var(--border-color);
+        color: var(--subtle-text-color);
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    .send-button:hover:not(:disabled) {
+        background-color: var(--accent-blue);
+    }
+
+    /* estado de loading no botão de envio */
+    .send-button.loading {
+        position: relative;
+        pointer-events: none;
+    }
+    .send-button.loading::after {
+        content: "";
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        width: 16px;
+        height: 16px;
+        margin-top: -8px;
+        border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.2);
+        border-top-color: rgba(255,255,255,0.9);
+        animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* link para o editor de dados */
+    .edit-data-link {
+        position: fixed;
+        top: 12px;
+        right: 64px;
+        background: var(--card-background);
+        color: var(--primary-dark);
+        border: 1px solid var(--border-color);
+        padding: 8px 10px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        z-index: 1000;
+        box-shadow: 0 2px 6px var(--shadow-color);
+    }
+    .edit-data-link:hover { background: var(--selection-color); }
+
+    /* Mensagens de Status */
+    .status-message {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 5px;
+        text-align: center;
+        display: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    .status-message.success {
+        background-color: var(--success-bg); 
+        color: var(--success-text); 
+        border: 1px solid var(--success-border);
+    }
+    .status-message.error {
+        background-color: var(--error-bg); 
+        color: var(--error-text); 
+        border: 1px solid var(--error-border);
+    }
+    .status-message.warning {
+         background-color: var(--warning-bg);
+         color: var(--warning-text);
+         border: 1px solid var(--warning-border);
+    }

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Seleção - Profissional</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <button id="theme-toggle" class="theme-toggle" aria-label="Alternar Tema">
+        🌙
+    </button>
+    <button id="history-toggle" class="theme-toggle history-btn" onclick="loadHistory()" aria-label="Histórico">
+        🕒
+    </button>
+
+    <div class="container">
+
+
+
+        <div id="screen-empresa" class="screen active">
+            <div class="header">
+                <h2>1. SELECIONE A EMPRESA</h2>
+            </div>
+            <div id="list-empresas">
+            </div>
+        </div>
+
+        <div id="screen-setor" class="screen">
+            <div class="header">
+                <button class="back-button" onclick="showScreen('screen-empresa')">← Voltar</button>
+                <h2>2. SETORES | <span id="current-empresa" style="color:var(--text-color);"></span></h2>
+            </div>
+            <div id="list-setores">
+            </div>
+        </div>
+
+        <div id="screen-funcionario" class="screen">
+            <div class="header">
+                <button class="back-button" onclick="showScreen('screen-setor')">← SETORES</button>
+                <h2>3. FUNCIONÁRIOS | <span id="current-setor" style="color:var(--text-color);"></span></h2>
+            </div>
+            <p style="text-transform: uppercase; font-size: 0.9em; color: var(--subtle-text-color);">Clique para
+                selecionar/desselecionar.</p>
+            <div id="list-funcionarios">
+            </div>
+
+            <button id="send-button" class="send-button" disabled onclick="sendSelectedFuncionarios()">
+                Enviar Selecionados (0)
+            </button>
+
+            <div id="status-message" class="status-message" aria-live="polite"></div>
+        </div>
+
+        <div id="screen-history" class="screen">
+            <div class="header">
+                <button class="back-button" onclick="showScreen('screen-empresa')">← INÍCIO</button>
+                <h2>HISTÓRICO (HOJE)</h2>
+            </div>
+            <p style="font-size: 0.9em; color: var(--subtle-text-color); margin-bottom: 15px;">
+                Toque em "Remover" para corrigir um envio indevido no aplicativo.
+            </p>
+            <div id="list-history">
+                <!-- Itens do histórico -->
+            </div>
+        </div>
+
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
