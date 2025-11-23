@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Sistema de Presença</title>
+    <link rel="stylesheet" href="css/admin-styles.css">
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>📊 ADMIN</h1>
+                <p class="user-info" id="admin-user"></p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-section="dashboard">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-section="funcionarios">
+                    <span class="icon">👥</span>
+                    <span>Funcionários</span>
+                </button>
+                <button class="nav-item" data-section="educadores">
+                    <span class="icon">👨‍🏫</span>
+                    <span>Educadores</span>
+                </button>
+                <button class="nav-item" data-section="acessos">
+                    <span class="icon">🔑</span>
+                    <span>Acessos</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="nav-item logout" onclick="logout()">
+                    <span class="icon">🚪</span>
+                    <span>Sair</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="section-dashboard" class="content-section active">
+                <header class="section-header">
+                    <h2>Dashboard - Presença</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="exportExcel()">📥 Exportar Excel</button>
+                        <button class="btn btn-secondary" onclick="refreshDashboard()">🔄 Atualizar</button>
+                    </div>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card highlight">
+                        <h3>Total Hoje</h3>
+                        <div class="stat-number" id="total-hoje">0</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card full">
+                        <h3>Presença nos Últimos 7 Dias</h3>
+                        <canvas id="chart-dias"></canvas>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>Por Empresa (Hoje)</h3>
+                        <canvas id="chart-empresas"></canvas>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>Por Setor (Hoje)</h3>
+                        <canvas id="chart-setores"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Funcionários Section -->
+            <section id="section-funcionarios" class="content-section">
+                <header class="section-header">
+                    <h2>Gerenciar Funcionários</h2>
+                    <button class="btn btn-primary" onclick="openEditModal()">+ Novo Funcionário</button>
+                </header>
+
+                <input type="text" id="search-funcionarios" placeholder="Buscar funcionário..." class="search-box">
+
+                <div id="list-funcionarios" class="data-list"></div>
+            </section>
+
+            <!-- Educadores Section -->
+            <section id="section-educadores" class="content-section">
+                <header class="section-header">
+                    <div>
+                        <h2>Gerenciar Educadores</h2>
+                        <p class="section-subtitle">Cadastre e gerencie os educadores do sistema</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openEducadorModal()">+ Novo Educador</button>
+                </header>
+
+                <input type="text" id="search-educadores" placeholder="Buscar educador..." class="search-box">
+
+                <div id="list-educadores" class="data-list"></div>
+            </section>
+
+            <!-- Acessos Section -->
+            <section id="section-acessos" class="content-section">
+                <header class="section-header">
+    </div>
+
+    <!-- Modal Funcionário -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h3>Editar Funcionário</h3>
+            <input type="hidden" id="edit-index">
+
+            <label>Nome</label>
+            <input type="text" id="edit-nome" placeholder="Nome Completo">
+
+            <label>Empresa</label>
+            <input type="text" id="edit-empresa" placeholder="Ex: HUB" list="empresas-list-admin">
+            <datalist id="empresas-list-admin"></datalist>
+
+            <label>Setor</label>
+            <input type="text" id="edit-setor" placeholder="Ex: TI" list="setores-list-admin">
+            <datalist id="setores-list-admin"></datalist>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveFuncionario()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Educador -->
+    <div id="educador-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="educador-modal-title">Novo Educador</h3>
+            <input type="hidden" id="educador-id">
+
+            <label>Nome de Usuário</label>
+            <input type="text" id="educador-username" placeholder="Digite o usuário">
+
+            <label>Senha</label>
+            <input type="password" id="educador-password" placeholder="Digite a senha">
+
+            <label>Nome Completo (opcional)</label>
+            <input type="text" id="educador-nome" placeholder="Nome completo do educador">
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeEducadorModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveEducador()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/admin-script.js"></script>
+</body>
+
+</html>

@@ -1,1 +1,0 @@
-const DADOS_FUNCIONARIOS = [];

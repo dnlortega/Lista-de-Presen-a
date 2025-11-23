@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Seleção - Profissional</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login-styles.css">
+    <link rel="stylesheet" href="css/responsive.css">
 </head>
 
 <body>
@@ -13,18 +15,48 @@
     <button id="theme-toggle" class="theme-toggle" aria-label="Alternar Tema">
         🌙
     </button>
-    <button id="history-toggle" class="theme-toggle history-btn" onclick="loadHistory()" aria-label="Histórico">
+    <button id="history-toggle" class="theme-toggle history-btn" onclick="loadHistory()" aria-label="Histórico"
+        style="display: none;">
         🕒
     </button>
-    <button id="admin-toggle" class="theme-toggle admin-btn" onclick="showAdminScreen()" aria-label="Gerenciar Dados">
+    <button id="admin-toggle" class="theme-toggle admin-btn" onclick="showAdminScreen()" aria-label="Gerenciar Dados"
+        style="display: none;">
         ⚙️
     </button>
+    <button id="logout-btn" class="theme-toggle logout-btn" onclick="logout()" aria-label="Sair"
+        style="display: none; top: 10px; left: 10px; right: auto;">
+        🚪
+    </button>
+    <div id="logged-user"
+        style="display: none; position: fixed; top: 15px; left: 60px; color: var(--text-color); font-size: 0.9em; font-weight: bold;">
+    </div>
 
     <div class="container">
 
+        <!-- TELA DE LOGIN -->
+        <div id="screen-login" class="screen active">
+            <div class="login-container">
+                <div class="login-header">
+                    <h1>Sistema de Presença</h1>
+                    <p>Faça login para continuar</p>
+                </div>
+                <form class="login-form" onsubmit="event.preventDefault(); login();">
+                    <div class="form-group">
+                        <label for="login-username">Usuário</label>
+                        <input type="text" id="login-username" placeholder="Digite seu usuário" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Senha</label>
+                        <input type="password" id="login-password" placeholder="Digite sua senha" required>
+                    </div>
+                    <div id="login-error" class="login-error"></div>
+                    <button type="submit" class="login-button">ENTRAR</button>
+                </form>
+            </div>
+        </div>
 
-
-        <div id="screen-empresa" class="screen active">
+        <!-- TELA 1: EMPRESAS -->
+        <div id="screen-empresa" class="screen">
             <div class="header">
                 <h2>1. SELECIONE A EMPRESA</h2>
             </div>
@@ -32,23 +64,28 @@
             </div>
         </div>
 
+        <!-- TELA 2: SETORES -->
         <div id="screen-setor" class="screen">
             <div class="header">
                 <button class="back-button" onclick="showScreen('screen-empresa')">← Voltar</button>
                 <h2>2. SETORES | <span id="current-empresa" style="color:var(--text-color);"></span></h2>
             </div>
             <div id="list-setores">
+                <!-- Setores serão carregados aqui -->
             </div>
         </div>
 
+        <!-- TELA 3: FUNCIONÁRIOS -->
         <div id="screen-funcionario" class="screen">
             <div class="header">
-                <button class="back-button" onclick="showScreen('screen-setor')">← SETORES</button>
+                <button class="back-button" id="back-to-setor">← SETORES</button>
                 <h2>3. FUNCIONÁRIOS | <span id="current-setor" style="color:var(--text-color);"></span></h2>
+                <button class="action-btn primary" id="btn-new-func-educador" onclick="openAddModalEducator()" style="display:none; margin-left: auto; font-size: 0.8em; padding: 5px 10px;">+ Novo</button>
             </div>
             <p style="text-transform: uppercase; font-size: 0.9em; color: var(--subtle-text-color);">Clique para
                 selecionar/desselecionar.</p>
             <div id="list-funcionarios">
+                <!-- Funcionários serão carregados aqui -->
             </div>
 
             <button id="send-button" class="send-button" disabled onclick="sendSelectedFuncionarios()">
@@ -58,6 +95,7 @@
             <div id="status-message" class="status-message" aria-live="polite"></div>
         </div>
 
+        <!-- TELA 4: HISTÓRICO -->
         <div id="screen-history" class="screen">
             <div class="header">
                 <button class="back-button" onclick="showScreen('screen-empresa')">← INÍCIO</button>
@@ -71,29 +109,152 @@
             </div>
         </div>
 
-        <div id="screen-admin" class="screen">
+        <!-- TELA 6: DASHBOARD -->
+        <div id="screen-dashboard" class="screen">
             <div class="header">
                 <button class="back-button" onclick="showScreen('screen-empresa')">← INÍCIO</button>
-                <h2>GERENCIAR DADOS</h2>
+                <h2>📊 DASHBOARD - PRESENÇA</h2>
             </div>
 
             <div class="admin-controls">
-                <button class="action-btn primary" onclick="openEditModal()">+ Novo Funcionário</button>
-                <button class="action-btn secondary" onclick="downloadDataJs()">⬇ Baixar data.js</button>
-                <button class="action-btn secondary" onclick="downloadCSV()">📊 Exportar CSV</button>
-                <button class="action-btn secondary" onclick="syncFuncionarios()">☁️ Sincronizar Nuvem</button>
-                <button class="action-btn danger" onclick="resetData()">⚠ Resetar</button>
+                <button class="action-btn primary" onclick="exportExcel()">📥 Exportar Excel (Hoje)</button>
+                <button class="action-btn secondary" onclick="loadDashboard()">🔄 Atualizar</button>
             </div>
 
-            <input type="text" id="admin-search" placeholder="Buscar funcionário..." onkeyup="filterAdminList()"
-                class="search-input">
+            <div style="margin-top: 20px;">
+                <div style="background: var(--card-bg); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-top: 0;">Total de Presença Hoje</h3>
+                    <div id="total-hoje"
+                        style="font-size: 3em; font-weight: bold; text-align: center; color: var(--primary-color);">0
+                    </div>
+                </div>
 
-            <div id="list-admin" class="admin-list">
-                <!-- Lista de funcionários para edição -->
+                <div style="background: var(--card-bg); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3>Presença nos Últimos 7 Dias</h3>
+                    <canvas id="chart-dias" style="max-height: 300px;"></canvas>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="background: var(--card-bg); padding: 20px; border-radius: 8px;">
+                        <h3>Por Empresa (Hoje)</h3>
+                        <canvas id="chart-empresas"></canvas>
+                    </div>
+                    <div style="background: var(--card-bg); padding: 20px; border-radius: 8px;">
+                        <h3>Por Setor (Hoje)</h3>
+                        <canvas id="chart-setores"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Modal de Edição -->
+        <!-- TELA 5: ADMIN (DESKTOP LAYOUT) -->
+        <div id="screen-admin" class="screen">
+            <div class="admin-desktop-layout">
+                <!-- Sidebar -->
+                <div class="admin-sidebar">
+                    <div class="admin-sidebar-header">
+                        <h2>📊 ADMIN</h2>
+                        <p style="font-size: 0.8em; opacity: 0.7;">Painel de Controle</p>
+                    </div>
+                    <nav class="admin-nav">
+                        <button class="admin-nav-item active" onclick="showAdminSection('dashboard')">
+                            <span class="nav-icon">📊</span>
+                            <span>Dashboard</span>
+                        </button>
+                        <button class="admin-nav-item" onclick="showAdminSection('funcionarios')">
+                            <span class="nav-icon">👥</span>
+                            <span>Funcionários</span>
+                        </button>
+                        <button class="admin-nav-item" onclick="showAdminSection('acessos')">
+                            <span class="nav-icon">🔑</span>
+                            <span>Acessos</span>
+                        </button>
+                        <button class="admin-nav-item danger" onclick="showScreen('screen-empresa')">
+                            <span class="nav-icon">←</span>
+                            <span>Voltar</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Main Content -->
+                <div class="admin-main-content">
+                    <!-- Dashboard Section -->
+                    <div id="admin-section-dashboard" class="admin-section active">
+                        <div class="admin-content-header">
+                            <h2>📊 Dashboard - Presença</h2>
+                            <div>
+                                <button class="action-btn primary" onclick="exportExcel()">📥 Exportar Excel</button>
+                                <button class="action-btn secondary" onclick="loadDashboard()">🔄 Atualizar</button>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-grid">
+                            <div class="dashboard-card">
+                                <h3>Total de Presença Hoje</h3>
+                                <div id="total-hoje-admin" class="dashboard-big-number">0</div>
+                            </div>
+
+                            <div class="dashboard-card full-width">
+                                <h3>Presença nos Últimos 7 Dias</h3>
+                                <canvas id="chart-dias-admin" style="max-height: 250px;"></canvas>
+                            </div>
+
+                            <div class="dashboard-card">
+                                <h3>Por Empresa (Hoje)</h3>
+                                <canvas id="chart-empresas-admin"></canvas>
+                            </div>
+
+                            <div class="dashboard-card">
+                                <h3>Por Setor (Hoje)</h3>
+                                <canvas id="chart-setores-admin"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Funcionários Section -->
+                    <div id="admin-section-funcionarios" class="admin-section">
+                        <div class="admin-content-header">
+                            <h2>👥 Gerenciar Funcionários</h2>
+                            <button class="action-btn primary" onclick="openEditModal()">+ Novo Funcionário</button>
+                        </div>
+
+                        <input type="text" id="admin-search" placeholder="Buscar funcionário..."
+                            onkeyup="filterAdminList()" class="search-input">
+
+                        <div id="list-admin" class="admin-list">
+                            <!-- Lista de funcionários para edição -->
+                        </div>
+                    </div>
+
+                    <!-- Acessos Section -->
+                    <div id="admin-section-acessos" class="admin-section">
+                        <div class="admin-content-header">
+                            <h2>🔑 Gerenciar Acessos</h2>
+                            <p style="opacity: 0.7;">Controle quais empresas cada educador pode acessar</p>
+                        </div>
+
+                        <div class="access-management">
+                            <label>Selecione o Educador:</label>
+                            <select id="access-user-select-inline" onchange="loadUserPermissionsInline()"
+                                class="search-input">
+                                <option value="">-- Selecione um educador --</option>
+                            </select>
+
+                            <div id="access-companies-inline" style="margin-top: 20px; display: none;">
+                                <label>Empresas Permitidas:</label>
+                                <div id="companies-checkboxes-inline" style="margin-top: 10px;">
+                                    <!-- Checkboxes serão carregados aqui -->
+                                </div>
+                                <button class="action-btn primary" onclick="saveUserPermissionsInline()"
+                                    style="margin-top: 15px;">Salvar Permissões</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Edição (Admin) -->
         <div id="edit-modal" class="modal">
             <div class="modal-content">
                 <h3>Editar Funcionário</h3>
@@ -103,10 +264,12 @@
                 <input type="text" id="edit-nome" placeholder="Nome Completo">
 
                 <label>Empresa</label>
-                <input type="text" id="edit-empresa" placeholder="Ex: HUB">
+                <input type="text" id="edit-empresa" placeholder="Ex: HUB" list="empresas-list">
+                <datalist id="empresas-list"></datalist>
 
                 <label>Setor</label>
-                <input type="text" id="edit-setor" placeholder="Ex: TI">
+                <input type="text" id="edit-setor" placeholder="Ex: TI" list="setores-list">
+                <datalist id="setores-list"></datalist>
 
                 <div class="modal-actions">
                     <button class="action-btn secondary" onclick="closeEditModal()">Cancelar</button>
@@ -115,10 +278,35 @@
             </div>
         </div>
 
+        <!-- Modal de Gerenciar Acessos -->
+        <div id="access-modal" class="modal">
+            <div class="modal-content">
+                <h3>Gerenciar Acessos de Educadores</h3>
+
+                <label>Selecione o Educador:</label>
+                <select id="access-user-select" onchange="loadUserPermissions()">
+                    <option value="">-- Selecione --</option>
+                </select>
+
+                <div id="access-companies" style="margin-top: 15px; display: none;">
+                    <label>Empresas Permitidas:</label>
+                    <div id="companies-checkboxes" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Checkboxes serão carregados aqui -->
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="action-btn secondary" onclick="closeAccessModal()">Cancelar</button>
+                    <button class="action-btn primary" onclick="saveUserPermissions()">Salvar</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <script src="data.js"></script>
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/script.js"></script>
 </body>
 
 </html>

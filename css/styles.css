@@ -80,12 +80,26 @@
         background-color: var(--background-color);
         color: var(--text-color);
         transition: background-color 0.3s;
+        font-size: 10px;
     }
 
     .container {
         max-width: 600px;
         margin: 0 auto;
-        padding: 15px;
+        padding: 1.5em;
+        font-size: 1em;
+    }
+
+    /* Admin screen breaks out of container */
+    #screen-admin {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #screen-admin .container {
+        max-width: none;
+        padding: 0;
     }
 
     .screen {
@@ -159,6 +173,20 @@
     .admin-btn {
         right: 110px;
         /* Posiciona ao lado do botão de histórico */
+    }
+
+    /* Hide top buttons when in Admin screen */
+    #screen-admin.active~.theme-toggle,
+    #screen-admin.active~.history-btn,
+    #screen-admin.active~.admin-btn,
+    #screen-admin.active~#logout-btn,
+    #screen-admin.active~#logged-user {
+        display: none !important;
+    }
+
+    /* Hide theme toggle on login screen */
+    #screen-login.active~#theme-toggle {
+        display: none !important;
     }
 
     /* Cabeçalhos */
@@ -515,4 +543,247 @@
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+}
+
+/* Choice Modal Buttons */
+.btn {
+    padding: 0.625rem 1.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: white;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background-color: var(--primary-dark);
+    color: white;
+    border-color: var(--primary-dark);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-blue);
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+    color: white;
+    border-color: var(--secondary);
+}
+
+.btn-secondary:hover {
+    opacity: 0.9;
+}
+
+/* --- DESKTOP LAYOUT FOR ADMIN --- */
+.admin-desktop-layout {
+    display: flex;
+    height: 100vh;
+    background-color: var(--background-color);
+}
+
+.admin-sidebar {
+    width: 250px;
+    background-color: var(--card-background);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 10px var(--shadow-color);
+}
+
+.admin-sidebar-header {
+    padding: 30px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-sidebar-header h2 {
+    margin: 0;
+    color: var(--primary-dark);
+    font-size: 1.5em;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    background: none;
+    border: none;
+    border-left: 3px solid transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 1em;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.admin-nav-item:hover {
+    background-color: var(--selection-color);
+    border-left-color: var(--accent-blue);
+}
+
+.admin-nav-item.active {
+    background-color: var(--selection-color);
+    border-left-color: var(--primary-dark);
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.admin-nav-item.danger {
+    margin-top: auto;
+    color: var(--error-text);
+}
+
+.admin-nav-item.danger:hover {
+    background-color: var(--error-bg);
+    border-left-color: var(--error-text);
+}
+
+.nav-icon {
+    font-size: 1.2em;
+    width: 24px;
+    text-align: center;
+}
+
+.admin-main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-section {
+    display: none;
+}
+
+.admin-section.active {
+    display: block;
+    animation: screenFadeIn 0.3s ease;
+}
+
+.admin-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.admin-content-header h2 {
+    margin: 0;
+    color: var(--primary-dark);
+}
+
+.admin-content-header div {
+    display: flex;
+    gap: 10px;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.dashboard-card {
+    background-color: var(--card-background);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.dashboard-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.dashboard-card h3 {
+    margin: 0 0 15px 0;
+    color: var(--text-color);
+    font-size: 1.1em;
+}
+
+.dashboard-big-number {
+    font-size: 4em;
+    font-weight: bold;
+    text-align: center;
+    color: var(--primary-dark);
+    margin: 20px 0;
+}
+
+/* Access Management */
+.access-management {
+    background-color: var(--card-background);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.access-management label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.access-management select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+#companies-checkboxes-inline {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    padding: 15px;
+    background-color: var(--background-color);
+    border-radius: 4px;
+}
+
+#companies-checkboxes-inline div {
+    display: flex;
+    align-items: center;
+}
+
+#companies-checkboxes-inline input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+#companies-checkboxes-inline label {
+    margin: 0;
+    font-weight: normal;
 }

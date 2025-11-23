@@ -1,0 +1,43 @@
+2025-11-23 01:32:02 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 01:33:09 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 01:55:14 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 01:55:20 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 01:55:32 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 01:56:26 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 01:56:31 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 02:06:47 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 02:07:04 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 02:08:15 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 02:10:36 - Erro de BD no login: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'empresas' in 'field list'
+2025-11-23 02:11:25 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 02:13:17 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 02:13:17 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 02:13:25 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 02:17:57 - Login bem-sucedido: admin (IP: ::1)
+2025-11-23 02:26:32 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 02:33:28 - Login bem-sucedido: admin (IP: 127.0.0.1)
+2025-11-23 02:34:56 - Login bem-sucedido: admin (IP: ::1)
+2025-11-23 02:35:31 - Login bem-sucedido: educador (IP: 127.0.0.1)
+2025-11-23 02:35:52 - Login bem-sucedido: Admin (IP: 192.168.1.7)
+2025-11-23 02:36:26 - Login bem-sucedido: Educador (IP: 192.168.1.7)
+2025-11-23 02:37:21 - Login bem-sucedido: admin (IP: ::1)
+2025-11-23 02:39:30 - Login bem-sucedido: admin (IP: ::1)
+2025-11-23 02:43:49 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 02:44:29 - Login bem-sucedido: admin (IP: ::1)
+2025-11-23 02:45:29 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 02:45:40 - Login bem-sucedido: admin (IP: ::1)
+2025-11-22 23:36:00 - Login bem-sucedido: educador (IP: ::1)
+2025-11-22 23:42:54 - Login bem-sucedido: admin (IP: ::1)
+2025-11-22 23:44:17 - Login bem-sucedido: DANIEL (IP: ::1)
+2025-11-22 23:58:02 - Login bem-sucedido: admin (IP: ::1)
+2025-11-23 00:09:40 - Login bem-sucedido: admin (IP: 127.0.0.1)
+2025-11-23 00:11:20 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 00:11:45 - Login bem-sucedido: admin (IP: ::1)
+2025-11-23 00:15:08 - Login bem-sucedido: admin (IP: 127.0.0.1)
+2025-11-23 00:17:08 - Login bem-sucedido: Educador (IP: 192.168.1.7)
+2025-11-23 00:17:15 - Login bem-sucedido: Admin (IP: 192.168.1.7)
+2025-11-23 10:10:53 - Login bem-sucedido: admin (IP: ::1)
+2025-11-23 10:11:44 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 10:18:26 - Login bem-sucedido: admin (IP: ::1)
+2025-11-23 10:30:50 - Login bem-sucedido: educador (IP: ::1)
+2025-11-23 10:31:43 - Login bem-sucedido: admin (IP: ::1)
